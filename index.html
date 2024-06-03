@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="music-player">
+            <nav>
+                <div class="circle">
+                    <i class="fa-solid fa-angle-left"></i>
+                </div>
+                <div class="circle">
+                    <i class="fa-solid fa-bars"></i>
+                </div>
+            </nav>
+            <img src="media/468-thumbnail.png" class="song-img">
+            <h1 id="title">Song title</h1>
+            <p id="artist">Artist name</p>
+
+            <audio id="audio" src="" preload="auto">
+
+            </audio>
+            <input type="range" value="0" id="progress">
+            <div class="controls">
+                <div onclick="prevSong()">
+                    <i class="fa-solid fa-backward" id="left"></i>
+                </div>
+                <div onclick="playPause()">
+                    <i class="fa-solid fa-play" id="pause"></i>
+
+                </div>
+                <div onclick="nextSong()">
+                    <i class="fa-solid fa-forward" id="right">
+
+                    </i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const songs = [
+            {
+                title: "Tere Naal",
+                src: "media/Tere Naal - Tulsi Kumar And Darshan Raval 128 Kbps.mp3",
+                singer: "Darshan raval"
+            },
+            {
+                title: "Asal Mein",
+                src: "media/Asal Mein - Darshan Raval 128 Kbps.mp3",
+                singer: "Darshan raval"
+            },
+            {
+                title: "Tu mileya",
+                src: "media/new_128_Tu Mileya - Darshan Raval.mp3",
+                singer: "Darshan raval"
+            },
+            {
+                title: "Tu Chahiye",
+                src: "media/Tu Chahiye - Bajrangi Bhaijaan 128 Kbps.mp3",
+                singer: "Arijit Singh"
+            },
+            {
+                title: "Mere Dholna",
+                src: "media/Mere Dholna - Bhool Bhulaiyaa 128 Kbps.mp3",
+                singer: "Shreya Ghoshal"
+            }
+        ];
+        let songIndex = 0;
+        let progress = document.getElementById("progress");
+        let song = document.getElementById("audio");
+        let ctrlIcon = document.getElementById("pause");
+        let title = document.getElementById("title");
+        let singer = document.getElementById("artist");
+
+        function loadSong() {
+            song.src = songs[songIndex].src;
+            title.innerHTML = songs[songIndex].title;
+            singer.innerHTML = songs[songIndex].singer;
+            song.load();
+            song.play();
+            ctrlIcon.classList.remove("fa-play");
+            ctrlIcon.classList.add("fa-pause");
+        }
+        function nextSong() {
+            songIndex++;
+            if (songIndex >= songs.length) {
+                songIndex = 0;
+            }
+            loadSong();
+        }
+
+        function prevSong() {
+            songIndex--;
+            if (songIndex < 0) {
+                songIndex = songs.length - 1;
+            }
+            loadSong();
+        }
+
+        song.onloadedmetadata = function () {
+            progress.max = song.duration;
+            progress.value = song.currentTime;
+
+        }
+
+        function playPause() {
+            if (ctrlIcon.classList.contains("fa-pause")) {
+                song.pause();
+                ctrlIcon.classList.remove("fa-pause");
+                ctrlIcon.classList.add("fa-play");
+            }
+            else {
+                song.play();
+                ctrlIcon.classList.remove("fa-play");
+                ctrlIcon.classList.add("fa-pause");
+            }
+       
+        }
+        song.ontimeupdate = function () {
+            progress.value = song.currentTime;
+        }
+
+        
+            setInterval(() => {
+                progress.value = song.currentTime;
+            }, 500);
+            song.play();
+
+        progress.onchange = function () {
+            
+            song.currentTime = progress.value;
+            ctrlIcon.classList.remove("fa-play");
+            ctrlIcon.classList.add("fa-pause");
+            song.play();
+        }
+
+        loadSong();
+
+
+    </script>
+</body>
+
+</html>
