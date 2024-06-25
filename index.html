@@ -15,34 +15,45 @@
     <div class="container">
         <div class="music-player">
             <nav>
-                <div class="circle">
-                    <i class="fa-solid fa-angle-left"></i>
+                <div class="circle" onclick="back()">
+                    <i class="fa-solid fa-angle-left" id="back"></i>
                 </div>
-                <div class="circle">
+                <div class="circle" onclick="toggleSongList()">
                     <i class="fa-solid fa-bars"></i>
                 </div>
             </nav>
-            <img src="media/468-thumbnail.png" class="song-img">
+            <img src="" class="song-img" id="song-img">
             <h1 id="title">Song title</h1>
             <p id="artist">Artist name</p>
 
-            <audio id="audio" src="" preload="auto">
-
-            </audio>
-            <input type="range" value="0" id="progress">
+            <audio id="audio" src="" preload="auto"></audio>
+            <div class="time-controls">
+                <span id="current-time">0:00</span>
+                <input type="range" value="0" id="progress">
+                <span id="end-time">0:00</span>
+            </div>
+            <div>
+                <i class="fa-solid fa-repeat" id="repeat" onclick="toggleRepeat()"></i>
+            </div>
             <div class="controls">
                 <div onclick="prevSong()">
                     <i class="fa-solid fa-backward" id="left"></i>
                 </div>
                 <div onclick="playPause()">
                     <i class="fa-solid fa-play" id="pause"></i>
-
                 </div>
                 <div onclick="nextSong()">
-                    <i class="fa-solid fa-forward" id="right">
-
-                    </i>
+                    <i class="fa-solid fa-forward" id="right"></i>
                 </div>
+            </div> 
+            <div class="song-list" id="song-list">
+                <ul>
+                    <li onclick="selectSong(0)">Tere Naal - Darshan Raval</li>
+                    <li onclick="selectSong(1)">Asal Mein - Darshan Raval</li>
+                    <li onclick="selectSong(2)">Tu Mileya - Darshan Raval</li>
+                    <li onclick="selectSong(3)">Tu Chahiye - Arijit Singh</li>
+                    <li onclick="selectSong(4)">Mere Dholna - Shreya Ghoshal</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -51,46 +62,60 @@
         const songs = [
             {
                 title: "Tere Naal",
-                src: "media/Tere Naal - Tulsi Kumar And Darshan Raval 128 Kbps.mp3",
+                songsrc: "media/Tere Naal - Tulsi Kumar And Darshan Raval 128 Kbps.mp3",
+                picsrc: "media/tere naal.jpg",
                 singer: "Darshan raval"
             },
             {
                 title: "Asal Mein",
-                src: "media/Asal Mein - Darshan Raval 128 Kbps.mp3",
+                songsrc: "media/Asal Mein - Darshan Raval 128 Kbps.mp3",
+                picsrc: "media/asal mein.jpeg",
                 singer: "Darshan raval"
             },
             {
                 title: "Tu mileya",
-                src: "media/new_128_Tu Mileya - Darshan Raval.mp3",
+                songsrc: "media/new_128_Tu Mileya - Darshan Raval.mp3",
+                picsrc: "media/tu mileya.jpg",
                 singer: "Darshan raval"
             },
             {
                 title: "Tu Chahiye",
-                src: "media/Tu Chahiye - Bajrangi Bhaijaan 128 Kbps.mp3",
+                songsrc: "media/Tu Chahiye - Bajrangi Bhaijaan 128 Kbps.mp3",
+                picsrc: "media/tu chahiye.jpg",
                 singer: "Arijit Singh"
             },
             {
                 title: "Mere Dholna",
-                src: "media/Mere Dholna - Bhool Bhulaiyaa 128 Kbps.mp3",
+                songsrc: "media/Mere Dholna - Bhool Bhulaiyaa 128 Kbps.mp3",
+                picsrc: "media/mere dholna.jpg",
                 singer: "Shreya Ghoshal"
             }
         ];
         let songIndex = 0;
         let progress = document.getElementById("progress");
         let song = document.getElementById("audio");
+        let pic = document.getElementById("song-img");
         let ctrlIcon = document.getElementById("pause");
         let title = document.getElementById("title");
         let singer = document.getElementById("artist");
+        let songImg = document.getElementById("song-img");
+        const repeatIcon = document.getElementById("repeat");
+        let currentTimeEl = document.getElementById("current-time");
+        let endTimeEl = document.getElementById("end-time");
+        let isRepeat = false;
 
         function loadSong() {
-            song.src = songs[songIndex].src;
+            song.src = songs[songIndex].songsrc;
+            pic.src = songs[songIndex].picsrc;
             title.innerHTML = songs[songIndex].title;
             singer.innerHTML = songs[songIndex].singer;
             song.load();
             song.play();
             ctrlIcon.classList.remove("fa-play");
             ctrlIcon.classList.add("fa-pause");
+            updateCurrentSongHighlight();
         }
+
         function nextSong() {
             songIndex++;
             if (songIndex >= songs.length) {
@@ -107,10 +132,12 @@
             loadSong();
         }
 
+       
+
         song.onloadedmetadata = function () {
             progress.max = song.duration;
             progress.value = song.currentTime;
-
+            endTimeEl.textContent = formatTime(song.duration);
         }
 
         function playPause() {
@@ -124,27 +151,99 @@
                 ctrlIcon.classList.remove("fa-play");
                 ctrlIcon.classList.add("fa-pause");
             }
+
        
         }
-        song.ontimeupdate = function () {
-            progress.value = song.currentTime;
+        function toggleRepeat() {
+            isRepeat = !isRepeat;
+    const repeatIcon = document.getElementById("repeat");
+    if (isRepeat) {
+        repeatIcon.classList.add("active");
+    } else {
+        repeatIcon.classList.remove("active");
+    }
+}
+
+function updateCurrentSongHighlight() {
+    const songItems = document.querySelectorAll('.song-list li');
+    songItems.forEach((item, index) => {
+        if (index === songIndex) {
+            item.classList.add('current-song');
+        } else {
+            item.classList.remove('current-song');
+        }
+    });
+}
+
+function selectSong(index) {
+            songIndex = index;
+            loadSong();
+            toggleSongList();
         }
 
+function toggleSongList() {
+            const songList = document.getElementById("song-list");
+            if(songList.classList.contains("show")){
+                songList.classList.remove("show");
+            }
+            else{
+                songList.classList.add("show");
+            }
+        }
+
+function back(){
+    const songList = document.getElementById("song-list");
+    if(songList.classList.contains("show")){
+                songList.classList.remove("show");
+            }
+}
+function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+song.onended = function () {
+    if (isRepeat) {
+        song.play();
+    } else {
+        nextSong();
+    }
+};
+        song.ontimeupdate = function () {
+            progress.value = song.currentTime;
+            currentTimeEl.textContent = formatTime(song.currentTime);
+        }
+        progress.oninput = function () {
+        song.currentTime = progress.value;
+        currentTimeEl.textContent = formatTime(song.currentTime);
+    };
         
             setInterval(() => {
                 progress.value = song.currentTime;
+                currentTimeEl.textContent = formatTime(song.currentTime);
             }, 500);
-            song.play();
+            
 
         progress.onchange = function () {
-            
             song.currentTime = progress.value;
             ctrlIcon.classList.remove("fa-play");
             ctrlIcon.classList.add("fa-pause");
             song.play();
         }
 
+        song.onended = function () {
+            if (isRepeat) {
+                song.play();
+            } 
+            else {
+                nextSong();
+            }
+    }
+
+       window.onload = function(){
         loadSong();
+       }
 
 
     </script>
